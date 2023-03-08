@@ -8,6 +8,14 @@ Traffic violation detection systems typically use cameras or sensors to capture 
 
 # The idea
 
+> Violence Detection
+
+The idea behind violence detection is that whenever a violence is detected the part where the violence occurs will be stored in the disk as a .avi/.mp4 file.Along with that a picture will also be captured.An alert will be sent to the officials along with the time,date and the saved image.A proposal for the detection of face of the violator has also been made.
+
+> Traffic-Light Violation Detection
+
+The idea behind Traffic-Light violence detection is that whenever a car passes the crossing whenever the light is red the video will be captured along with the plate number and an alert will be sent to the official.
+
 # Algorithms Used
 
 The Algorithms used for the detection of Street Violence is CNN-LSTM.
@@ -17,7 +25,7 @@ For traffic-Light violation we are using RCNN,YOLOV5 and ALPR.
 
 For Violence detection 
 
-> Tensorflow version 2.0.0 ,numpy,skimage.io,opencv,PIL,BytesIO,time
+> Tensorflow version 2.0.0 ,numpy,skimage.io,opencv,PIL,BytesIO,time,tkinter,MTCNN(for face detection)
 
 For Traffic-Light Violation
 
@@ -35,10 +43,10 @@ Real Life Violence Situations Dataset - https://www.kaggle.com/datasets/mohamedm
 
 Run **ViolenceDetection.ipynb** on jupyter notebook
 
-If you like to change the model weights change the name of the arguments where the model name exists such as **modelweight** in both **localfiletesting.py** and **violencedetection.ipynb**.
+If you like to change the model weights change the name of the arguments where the model name exists such as **modelweight** in both **localfiletesting.py** and **ViolenceDetection.ipynb**.
 
-I will upload my model once i finish the training and testing of the model.
+I will upload my model once I finish the training and testing of the model.
 
 # Remarks
 
-So far i have only implemented street Violence Detection and I will be finishing of the traffic-light violation detection and combining these 2 models so that we will get both desired output from the input/Live feed.Along with this a UI will also be implemented.
+So far I have only implemented street Violence Detection and I will be finishing of the traffic-light violation detection and combining these 2 models so that we will get both desired output from the single input/Live feed.Along with this a UI will also be implemented.The Alert system will be implemented in the coming days.
