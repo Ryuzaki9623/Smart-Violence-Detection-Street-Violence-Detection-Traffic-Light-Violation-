@@ -35,7 +35,7 @@ print(device_lib.list_local_devices())
 # In[ ]:
 
 
-def mamon_videoFightModel2(tf,wight='modelweight.hdfs'):
+def Det_Model(tf,wight='modelweight.hdfs'):
     layers = tf.keras.layers
     models = tf.keras.models
     losses = tf.keras.losses
@@ -86,7 +86,7 @@ def mamon_videoFightModel2(tf,wight='modelweight.hdfs'):
 import numpy as np
 from skimage.transform import resize
 np.random.seed(1234)
-model22 = mamon_videoFightModel2(tf)
+model22 = Det_Model(tf)
 
 
 # In[1]:
@@ -98,7 +98,7 @@ model22 = mamon_videoFightModel2(tf)
 # In[6]:
 
 
-def video_mamonreader(cv2,filename):
+def video_reader(cv2,filename):
     frames = np.zeros((30, 160, 160, 3), dtype=np.float)
     i=0
     print(frames.shape)
