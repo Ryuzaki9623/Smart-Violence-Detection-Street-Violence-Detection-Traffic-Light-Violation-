@@ -35,7 +35,7 @@ print(device_lib.list_local_devices())
 # In[ ]:
 
 
-def Det_Model(tf,wight='modelweight.hdfs'):
+def Det_Model(tf,wight='fightw.hdfs'):
     layers = tf.keras.layers
     models = tf.keras.models
     losses = tf.keras.losses
