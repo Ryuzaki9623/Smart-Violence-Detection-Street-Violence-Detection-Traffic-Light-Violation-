@@ -10,7 +10,7 @@ Traffic violation detection systems typically use cameras or sensors to capture 
 
 > Violence Detection
 
-The idea behind violence detection is that whenever a violence is detected the part where the violence occurs will be stored in the disk as a .avi/.mp4 file.Along with that a picture will also be captured.An alert will be sent to the officials along with the time,date and the saved image.A proposal for the detection of face of the violator has also been made.
+The idea behind violence detection is that whenever a violence is detected the part where the violence occurs will be stored in the disk as a .avi/.mp4 file.Along with that a picture will also be captured.An alert will be sent to the officials along with the time,date and the saved image.The face of the person will be captured when a violence is committed.
 
 > Traffic-Light Violation Detection
 
