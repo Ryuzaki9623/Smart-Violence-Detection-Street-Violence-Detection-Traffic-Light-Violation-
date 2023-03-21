@@ -29,9 +29,10 @@ For Violence detection
 
 For Traffic-Light Violation
 
-> Tensorflow >= 2.0.0
-> opencv >= 4.5,numpy
-> tkinter
+> Tensorflow >= 2.0.0,
+> opencv >= 4.5,
+> numpy,
+> TKinter
 
 # Datasets used
 
