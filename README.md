@@ -19,7 +19,7 @@ The idea behind Traffic-Light violence detection is that whenever a car passes t
 # Algorithms Used
 
 The Algorithms used for the detection of Street Violence is CNN-LSTM.
-For traffic-Light violation we are using RCNN,YOLOV5 and ALPR.
+For traffic-Light violation we are using YOLOV3 and ANPR.
 
 # Packages Required
 
@@ -29,7 +29,10 @@ For Violence detection
 
 For Traffic-Light Violation
 
-> Will be updating soon
+> Tensorflow >= 2.0.0,
+> opencv >= 4.5,
+> numpy,
+> TKinter
 
 # Datasets used
 
@@ -47,6 +50,8 @@ If you like to change the model weights change the name of the arguments where t
 
 I will upload my model once I finish the training and testing of the model.
 
+To run traffic light violation detection just run **main.py**
+
 # Remarks
 
-So far I have only implemented street Violence Detection and I will be finishing of the traffic-light violation detection and combining these 2 models so that we will get both desired output from the single input/Live feed.Along with this a UI will also be implemented.The Alert system will be implemented in the coming days.
+So far I have implemented street Violence Detection and traffic light violation detection and .Along with this a UI will also be implemented.The Alert system will be implemented in the coming days.The things which are left to do are number plate detection in traffic light violation detection and the alert system for both.
