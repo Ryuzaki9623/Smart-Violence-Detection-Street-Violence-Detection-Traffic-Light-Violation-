@@ -30,7 +30,7 @@ For Violence detection
 For Traffic-Light Violation
 
 > Tensorflow >= 2.0.0,
-> opencv >= 4.5,
+> opencv >= 4.2,
 > numpy,
 > TKinter
 
@@ -54,4 +54,4 @@ To run traffic light violation detection just run **main.py**
 
 # Remarks
 
-So far I have implemented street Violence Detection and traffic light violation detection and .Along with this a UI will also be implemented.The Alert system will be implemented in the coming days.The things which are left to do are number plate detection in traffic light violation detection and the alert system for both.
+I have implemented traffic light detection,violence detection along with a UI made with reactjs connected via flask.There are a few bugs in the code which i will fix it after i fully complete it .A person identification feature has been added in the violence detection module along with that if the video has some good clarity then the face will also be detected.I still have to add number plate capturing thing in the red light violation detection.Also an alert system was implemented in this.
