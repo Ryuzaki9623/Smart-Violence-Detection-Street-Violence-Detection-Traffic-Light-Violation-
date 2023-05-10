@@ -23,7 +23,7 @@ However, if there are detected boxes with no good matches with any of the tracki
 ### Violation detection
 A vehicle violates if it satisfies two conditions, if its center y value crosses the violation line AND if the current status of the detected traffic light is red, when those two conditions present the vehicle violates the red light and its tracker is moved to the violated tracking list. When the traffic light is detected, recognizing its status can be done greedily using color histogram. Each pixel in the traffic light is mapped to either red, yellow/orange, green or other, after this the maximum summation of the pins is simply chosen as the status of the traffic light.
 
-The Following is the proposed flow for violence Detection
+The Following is the proposed flow for red light violation Detection
 
 <img width="327" alt="proposed flow" src="https://github.com/Ryuzaki9623/Smart-Violence-Detection-Street-Violence-Detection-Traffic-Light-Violation-/assets/45362890/e10b3430-a6d7-4004-a8c2-059b23500d00">
 
