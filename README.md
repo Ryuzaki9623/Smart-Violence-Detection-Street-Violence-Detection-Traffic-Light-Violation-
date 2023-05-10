@@ -38,6 +38,11 @@ For Traffic-Light Violation
 > numpy,
 > TKinter
 
+Libraries needed for React
+
+> axios
+> Firebase-admin
+
 # Datasets used
 
 > Violence Detection
