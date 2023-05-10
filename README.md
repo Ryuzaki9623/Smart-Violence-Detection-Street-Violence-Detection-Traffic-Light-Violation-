@@ -16,10 +16,14 @@ The idea behind violence detection is that whenever a violence is detected the p
 
 The idea behind Traffic-Light violence detection is that whenever a car passes the crossing whenever the light is red the video will be captured along with the plate number and an alert will be sent to the official.
 
+> Final Backend
+
+I have integrated both the violence detection and red light violation module so that the detection will take place based on the given input video
+
 # Algorithms Used
 
-The Algorithms used for the detection of Street Violence is CNN-LSTM.
-For traffic-Light violation we are using YOLOV3 and ANPR.
+The Algorithms used for the detection of Street Violence is CNN-LSTM and HOG for detecting the people.
+For traffic-Light violation we are using YOLOV3.
 
 # Packages Required
 
@@ -34,6 +38,11 @@ For Traffic-Light Violation
 > numpy,
 > TKinter
 
+Libraries needed for React
+
+> axios,
+> Firebase-admin
+
 # Datasets used
 
 > Violence Detection
@@ -41,6 +50,10 @@ For Traffic-Light Violation
 Hockey Fight Dataset - https://academictorrents.com/details/38d9ed996a5a75a039b84cf8a137be794e7cee89
 
 Real Life Violence Situations Dataset - https://www.kaggle.com/datasets/mohamedmustafa/real-life-violence-situations-dataset
+
+> Red Light Violation 
+
+Download YoloV3 weights from here - https://pjreddie.com/media/files/yolov3.weights
 
 # How To Run
 
@@ -54,4 +67,4 @@ To run traffic light violation detection just run **main.py**
 
 # Remarks
 
-I have implemented traffic light detection,violence detection along with a UI made with reactjs connected via flask.There are a few bugs in the code which i will fix it after i fully complete it .A person identification feature has been added in the violence detection module along with that if the video has some good clarity then the face will also be detected.I still have to add number plate capturing thing in the red light violation detection.Also an alert system was implemented in this.
+I have implemented traffic light detection,violence detection along with a UI made with reactjs connected via flask.There are a few bugs in the code which i will fix it after i fully complete it .A person identification feature has been added in the violence detection module along with that if the video has some good clarity then the face will also be detected.Also an alert system was implemented in this.
