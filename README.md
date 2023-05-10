@@ -22,8 +22,8 @@ I have integrated both the violence detection and red light violation module so 
 
 # Algorithms Used
 
-The Algorithms used for the detection of Street Violence is CNN-LSTM.
-For traffic-Light violation we are using YOLOV3 and ANPR.
+The Algorithms used for the detection of Street Violence is CNN-LSTM and HOG for detecting the people.
+For traffic-Light violation we are using YOLOV3.
 
 # Packages Required
 
@@ -40,7 +40,7 @@ For Traffic-Light Violation
 
 Libraries needed for React
 
-> axios
+> axios,
 > Firebase-admin
 
 # Datasets used
@@ -52,6 +52,7 @@ Hockey Fight Dataset - https://academictorrents.com/details/38d9ed996a5a75a039b8
 Real Life Violence Situations Dataset - https://www.kaggle.com/datasets/mohamedmustafa/real-life-violence-situations-dataset
 
 > Red Light Violation 
+
 Download YoloV3 weights from here - https://pjreddie.com/media/files/yolov3.weights
 
 # How To Run
