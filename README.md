@@ -16,6 +16,10 @@ The idea behind violence detection is that whenever a violence is detected the p
 
 The idea behind Traffic-Light violence detection is that whenever a car passes the crossing whenever the light is red the video will be captured along with the plate number and an alert will be sent to the official.
 
+> Final Backend
+
+I have integrated both the violence detection and red light violation module so that the detection will take place based on the given input video
+
 # Algorithms Used
 
 The Algorithms used for the detection of Street Violence is CNN-LSTM.
@@ -42,6 +46,8 @@ Hockey Fight Dataset - https://academictorrents.com/details/38d9ed996a5a75a039b8
 
 Real Life Violence Situations Dataset - https://www.kaggle.com/datasets/mohamedmustafa/real-life-violence-situations-dataset
 
+Download YoloV3 weights from here - https://pjreddie.com/media/files/yolov3.weights
+
 # How To Run
 
 Run **ViolenceDetection.ipynb** on jupyter notebook
@@ -54,4 +60,4 @@ To run traffic light violation detection just run **main.py**
 
 # Remarks
 
-I have implemented traffic light detection,violence detection along with a UI made with reactjs connected via flask.There are a few bugs in the code which i will fix it after i fully complete it .A person identification feature has been added in the violence detection module along with that if the video has some good clarity then the face will also be detected.I still have to add number plate capturing thing in the red light violation detection.Also an alert system was implemented in this.
+I have implemented traffic light detection,violence detection along with a UI made with reactjs connected via flask.There are a few bugs in the code which i will fix it after i fully complete it .A person identification feature has been added in the violence detection module along with that if the video has some good clarity then the face will also be detected.Also an alert system was implemented in this.
