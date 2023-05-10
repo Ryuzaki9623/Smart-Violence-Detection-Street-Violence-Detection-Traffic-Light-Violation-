@@ -1,0 +1,60 @@
+.register{
+    height: 80%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+}
+
+.register-container{
+    height: 90%;
+    width: 35%;
+    background-color: ghostwhite;
+    line-height: 100%;
+    border-radius: 3rem;
+    padding: 2rem;
+    margin-top: 3rem;
+}
+
+
+.register-header span {
+    color: #ed3e32;
+}
+
+
+.register-header{
+    width: 100%;
+    text-align: center;
+    padding: 1rem 0 3rem 0;
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+.register-body{
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.register-body p{
+    text-align: start;
+}
+
+
+.register-button {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.register-body TextField:hover{
+    background-color: #FB490F;
+}
+.forget {
+    margin-top: 20px;
+    font-size: 14px;
+    text-align: center;
+}

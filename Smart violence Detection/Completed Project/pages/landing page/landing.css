@@ -1,0 +1,55 @@
+.landing-page{
+    height: 90%;
+    width: 100%;
+    padding: 3rem;
+}
+
+.landing-page-container{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.landing-page-img, .landing-page-head {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: #322f2f;
+}
+
+.landing-page-head p:nth-child(1){
+    font-size: 4rem;
+}
+
+
+.landing-page-head p:nth-child(2){
+    font-size: 2rem;
+    color: #000;
+    font-weight: 400;
+}
+
+
+    .landing-page-head p:nth-child(3) {
+        font-size: 3rem;
+        color: #ed3e32;
+        font-weight: 600;
+    }
+
+    .landing-page-head p span {
+        color: #ed3e32;
+        font-weight: 600;
+    }
+
+.landing-page-img img{
+    height: 80%;
+    width: 85%;
+    z-index: 1;
+}
+
+.landing-page-head button{
+    margin-top: 2rem;
+}
