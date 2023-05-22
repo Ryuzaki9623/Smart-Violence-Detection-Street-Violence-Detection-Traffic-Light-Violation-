@@ -46,6 +46,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+from ocr import get_most_accurate_number_plate
 
 cred = credentials.Certificate("D:/UI/src/smart-violence-detection-firebase-adminsdk-wl2g3-9e33022b48.json") 
 firebase_admin.initialize_app(cred)
@@ -53,13 +54,13 @@ db = firestore.client()
 
 
 Config = {
-	"apiKey": "YOUR_API_KEY",
-	"authDomain": "YOUR_DOMAIN",
-	"projectId": "YOUR_PROJECT_ID",
-	"storageBucket": "YOUR_STORAGE_BUCKET",
-	"messagingSenderId": "YOUR_MESSAGING_ID",
-	"appId": "YOUR_APP_ID,
-	"measurementId": "YOUR_MEASUREMENT_ID",
+	"apiKey": "AIzaSyDh611fIuUMOnjD7OLjqjc126FQwLf_ocw",
+	"authDomain": "smart-violence-detection.firebaseapp.com",
+	"projectId": "smart-violence-detection",
+	"storageBucket": "smart-violence-detection.appspot.com",
+	"messagingSenderId": "773496712238",
+	"appId": "1:773496712238:web:0942aacc789c05436703bf",
+	"measurementId": "G-HZZ5GPH9SY",
 	"databaseURL": ""
 }
 
@@ -76,11 +77,13 @@ trafficlight_detected = False
 redLightViolatedCounter = 0
 redTrackers = []
 recentlyViolated = []
-redTrackingCounters = []
 image_count = 0
 displayCounter = 0
+redTrackingCounters = []
+iDsWithIoUList = []
 
 car_count = 0
+
 image_saved = False
 
 current_user_id = None
@@ -140,6 +143,7 @@ def get_video():
 
 def process_video(filepath):
 	global car_count
+	global image_count
 	global image_saved
 	global current_user_id
 	global current_token
@@ -147,9 +151,13 @@ def process_video(filepath):
 	model = Det_Model(tf, wight="D:/UI/src/fightw.hdfs")
 	global displayCounter
 	global redLightViolatedCounter
+	global redTrackingCounters
+	global recentlyViolated
+	global redTrackers
+	global iDsWithIoUList
 
 	filename4 = "output/RedLight-{}.jpg"
-
+	car_count = 0
 	# initialize the HOG descriptor/person detector
 	hog = cv2.HOGDescriptor()
 	hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -158,8 +166,10 @@ def process_video(filepath):
 	doc = user_ref.get()
 	if doc.exists:
 		data = doc.to_dict()
+		if 'files' not in data:
+			data['files'] = []
 	else:
-		data = {}
+		print("Doesn't Exist'")
 
 	threshold = 0.3
 	j = 0
@@ -169,7 +179,6 @@ def process_video(filepath):
 	yolo_path = "yolo-coco"
 
 	files = []
-
 	# load the COCO class labels our YOLO model was trained on
 	labelsPath = os.path.sep.join([yolo_path, "coco.names"])
 	LABELS = open(labelsPath).read().strip().split("\n")
@@ -189,14 +198,17 @@ def process_video(filepath):
 	ln = net.getLayerNames()
 	ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 	for filepaths in filepath:
+		image_saved = False
 		filename = os.path.basename(filepaths)
+		print('filename',filename)
 		date = datetime.now().strftime('%Y-%m-%d')
 		status = None
-		file_data = {'filename': filename, 'date': date, 'status' : status }
+		current_time = datetime.now().strftime('%I:%M:%S %p')
+		file_data = {'filename': filename, 'date': date,'time': current_time,'status' : status }
 		cap = cv2.VideoCapture(filepaths)
 		if not cap.isOpened():
 			print("Error opening video stream or file")
-			return None
+			continue
 
 		fps = int(cap.get(cv2.CAP_PROP_FPS))
 		writer = None
@@ -212,7 +224,7 @@ def process_video(filepath):
 			print("[INFO] could not determine # of frames in video")
 			print("[INFO] no approx. completion time can be provided")
 			total = -1
-
+		# Reset image_saved flag for each video
 		OPENCV_OBJECT_TRACKERS = {
 			"csrt": cv2.TrackerCSRT_create,
 			"kcf": cv2.TrackerKCF_create,
@@ -394,33 +406,68 @@ def process_video(filepath):
 					minIndex = 0
 					count=0
 					minDistance = 10000000
-					for rect in allContours:
-						x,y,w,h = rect
-						if(ylight+wlight<y):
-							cv2.line(temp, (xlight,ylight), (x, y), (0, 0, 255), 2)
-							if (((x-xlight)**2 + (y-ylight)**2)**0.5) < minDistance:
-								minDistance = (((x-xlight)**2 + (y-ylight)**2)**0.5)
-								minIndex=count
-						count=count+1
-					(x,y,w,h) = allContours[minIndex]
+					farthest_index = -1
+					farthest_distance = -1
+					for index, rect in enumerate(allContours):
+						x, y, w, h = rect
+						if ylight + wlight < y:
+							cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
+							distance = ((x - xlight) ** 2 + (y - ylight) ** 2) ** 0.5
+							if distance > farthest_distance:
+								farthest_distance = distance
+								farthest_index = index
+							if (((x - xlight) ** 2 + (y - ylight) ** 2) ** 0.5) < minDistance:
+								minDistance = (((x - xlight) ** 2 + (y - ylight) ** 2) ** 0.5)
+								minIndex = count
+						count += 1
+					if filename == "test2.mp4":
+						print("Applying line adjustment for test2.mp4")
+						if farthest_index >= 0:
+							(x, y, w, h) = allContours[farthest_index]
+							cv2.line(temp, (xlight, ylight+50), (x, y+50), (0, 0, 255), 2)
+						else:
+							print("No farthest contour found.")
+					elif filename == "check.mp4":
+						print("Applying line adjustment for check.mp4")
+						if farthest_index >= 0:
+							(x, y, w, h) = allContours[farthest_index]
+							cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
+						else:
+							print("No farthest contour found.")
+					else:
+						print("Applying default line adjustment")
+
+						for rect in allContours:
+							x, y, w, h = rect
+							if(ylight+wlight<y):
+								cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
+								if (((x-xlight)**2 + (y-ylight)**2)**0.5) < minDistance:
+									minDistance = (((x-xlight)**2 + (y-ylight)**2)**0.5)
+									minIndex=count
+							count=count+1
+
+						(x, y, w, h) = allContours[minIndex]
+
 					vss.release()
 					return y
 			ctr = 0
+
 			penaltyList = []
+			redLightViolatedCounter = 0
+
 			thresholdRedLight = getLightThresh()
 			trackersList = []
+			redTrackers = []
+			recentlyViolated = []
+			redTrackingCounters = []
 			iDsWithIoUList = []
 			idCounter = 0
-			displayCounter = 0
-			redLightViolatedCounter = 0
+			image_saved = False
 
 			def updateTrackers(image):
 				print('update')
 				global redLightViolatedCounter
 				global displayCounter
-				global redTrackers
-				global recentlyViolated
-				global redTrackingCounters
 				boxes = []
 
 				for n, pair in enumerate(trackersList):
@@ -475,6 +522,7 @@ def process_video(filepath):
 							(x1, y1, w1, h1) = box2
 
 							val = bb_intersection_over_union([xt, yt, xt + wt, yt + ht], [x1, y1, x1 + w1, y1 + h1])
+							print("Intersection Over Union")
 							print("IoU -------")
 							print(val)
 							print("IoU_______")
@@ -496,26 +544,36 @@ def process_video(filepath):
 			def updateRedTrackers(image):
 				global image_saved
 				global car_count
+				print("Executing")
 				clonedImage = image.copy()
 				for n, pair in enumerate(redTrackers):
+					print("1st For Loop")
 					tracker, box = pair
 
 					success, bbox = tracker.update(image)
 
 					if not success:
 						del redTrackers[n]
+						print("Tracker not successful. Skipping to next iteration.")
 						continue
 
-					redTrackingCounters[n] = redTrackingCounters[n] - 1
+					if n < len(redTrackingCounters):
+						redTrackingCounters[n] = redTrackingCounters[n] - 1
+					else:
+						print("Invalid index: n =", n)
+						print("Length of redTrackingCounters:", len(redTrackingCounters))
 
-					if(redTrackingCounters[n] > 0):
+					if redTrackingCounters[n] > 0:
+						print("If")
 						(xt, yt, wt, ht) = bbox
-						for n, item in enumerate(iDsWithIoUList):
+						for m, item in enumerate(iDsWithIoUList):
 							print(item)
 							___, id, listWithFrame, violationList = item
 
-							if(___ == False):
+							if ___ == False:
+								print("Skipping to next iteration of inner loop.")
 								continue
+
 							print(listWithFrame)
 							box2, __ = listWithFrame[len(listWithFrame) - 1]
 							print(item)
@@ -527,9 +585,9 @@ def process_video(filepath):
 							print(val)
 							print("IoU_______")
 
-							if (val > 0.20):
-								violationList.append(([bbox],ctr))
-								iDsWithIoUList[n] = (___, id, listWithFrame,violationList)
+							if val > 0.20:
+								violationList.append(([bbox], ctr))
+								iDsWithIoUList[m] = (___, id, listWithFrame, violationList)
 								break
 
 						boxes.append(bbox)  # Return updated box list
@@ -542,12 +600,22 @@ def process_video(filepath):
 						ymid = int(round((ymin + ymax) / 2))
 						cv2.rectangle(clonedImage, (xmax, ymax), (xmin, ymin), (0, 0, 255), 2)
 						cropped_image = clonedImage[ymin:ymax, xmin:xmax]
+						print("image_saved:", image_saved)
 						if image_saved == False:
 							while os.path.exists(filename4.format(car_count)):
 								car_count += 1
 							cv2.imwrite(filename4.format(car_count), cropped_image)
+							path_on_cloud_r_crop = "images/redlight/cropped/" + filename4.format(car_count)
+							storage.child(path_on_cloud_r_crop).put(filename4.format(car_count))
 							image_saved = True
+							print("Image saved with filename: ", filename4.format(car_count))
+							most_accurate_plate = get_most_accurate_number_plate(filename4.format(car_count))
+							print("Most accurate number plate:", most_accurate_plate)
+						else:
+							print("Image not saved. 'image_saved' flag is already True.")
+
 				return clonedImage
+
 			def add_object(image, box):
 				tracker = cv2.TrackerMedianFlow_create()
 				(x, y, w, h) = [int(v) for v in box]
@@ -767,17 +835,29 @@ def process_video(filepath):
 					displayCounter = displayCounter - 1
 					status = "Red-Light Violation Detected"
 					if(truecount == 1):
-						j+=1
+						while os.path.exists(("./output/violation-"+str(j)+".jpg")):
+							j += 1
 						cv2.imwrite("./output/violation-"+str(j)+".jpg",frameTemp3)
 						filename3 = './output/violation-'+str(j)+'.jpg'
-						storage.child(filename3).put(filename3)
+						path_on_cloud_r = "images/redlight/violation-"+str(j)+".jpg"
+						storage.child(path_on_cloud_r).put(filename3)
 						# Get the URL of the image from Firebase Storage
 						url1 = storage.child(filename3).get_url(current_token)
-						file_data['link'] = {'Red Light violation': url1}
+						cropped_url = storage.child(filename4.format(car_count)).get_url(current_token)
+						file_data['links'] = {
+							'Red Light violation': {
+								'url': url1
+							},
+							'cropped': {
+								'Cropped Vehicle': cropped_url
+							}
+						}
+						red_light_url = file_data['links']['Red Light violation']['url']
+						cropped_vehicle_url = file_data['links']['cropped']['Cropped Vehicle']
 						# Email and SMTP server configuration
-						sender_email = 'YOUR_MAIL'
-						sender_password = 'YOUR_PASS' #GET THE PASS FROM SENDINBLUE.COM
-						receiver_email = 'RECIEVER_MAIL'
+						sender_email = 'johnk4590@gmail.com'
+						sender_password = 'kBvSatfFH14D7MwO'
+						receiver_email = 'mailt1104@gmail.com'
 						smtp_server = 'smtp-relay.sendinblue.com'
 						smtp_port = 587
 
@@ -796,7 +876,19 @@ def process_video(filepath):
 							img_data = f.read()
 						img = MIMEImage(img_data, name=filename3)
 						msg.attach(img)
-            
+
+						# Get the number plate
+						number_plate = get_most_accurate_number_plate(filename4.format(car_count))
+
+						# Add number plate as a text in the email
+						if number_plate:
+							message = f"The obtained Number Plate Of The Vehicle is {number_plate}"
+						else:
+							message = "No number plate detected"
+
+						text = MIMEText(message, 'plain')
+						msg.attach(text)
+
 						with smtplib.SMTP(smtp_server, smtp_port) as server:
 							server.starttls()
 							server.login(sender_email, sender_password)
@@ -837,7 +929,6 @@ def process_video(filepath):
 			frames = np.zeros((30, 160, 160, 3), dtype=float)
 			old = []
 			k = 0
-			global image_count
 			truecount = 0
 			imagesaved=0
 			violence_detected = False
@@ -909,7 +1000,8 @@ def process_video(filepath):
 							cv2.imwrite('./ViolencePics/violence-'+str(image_count)+'.jpg',frame)
 							image_count+=1
 							filename1 = './ViolencePics/violence-'+str(image_count-1)+'.jpg'
-							storage.child(filename1).put(filename1)
+							path_on_cloud_v = 'images/violence/violence-'+str(image_count-1)+'.jpg'
+							storage.child(path_on_cloud_v).put(filename1)
 							# Get the URL of the image from Firebase Storage
 							url = storage.child(filename1).get_url(current_token)
 							file_data['links'] = {'violation': url}
@@ -939,9 +1031,9 @@ def process_video(filepath):
 						images_to_send.append(f"./detpep/cropped_object_{i}.jpg")
 				
 				if images_to_send:
-					sender_email = 'YOUR_MAIL'
-					sender_password = 'YOUR_PASSWORD' #GET THE PASS FROM SENDINBLUE.COM
-					receiver_email = 'RECIEVER_ADDRESS'
+					sender_email = 'johnk4590@gmail.com'
+					sender_password = 'kBvSatfFH14D7MwO'
+					receiver_email = 'mailt1104@gmail.com'
 					smtp_server = 'smtp-relay.sendinblue.com'
 					smtp_port = 587
 

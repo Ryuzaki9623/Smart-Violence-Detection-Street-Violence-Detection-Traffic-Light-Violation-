@@ -27,7 +27,7 @@ function TableComponent() {
                 const userFiles = docSnap.data().files;
                 const data = userFiles.map((file, index) => ({
                     id: index + 1,
-                    date: file.dateAdded || '',
+                    date: file.date || '',
                     fileName: file.name || '',
                     Details: file.status || '',
                 }));
@@ -53,6 +53,7 @@ function TableComponent() {
                         const data = userFiles.map((file, index) => ({
                             id: index + 1,
                             date: file.date || '',
+                            time: file.time || '',
                             fileName: file.filename || '',
                             Details: file.status || ''
                         }));
@@ -81,6 +82,7 @@ function TableComponent() {
                         <TableRow>
                             <TableCell>No</TableCell>
                             <TableCell align="center">Date</TableCell>
+                            <TableCell align="center">time</TableCell>
                             <TableCell align="center">File Name</TableCell>
                             <TableCell align="center">Status</TableCell>
                         </TableRow>
@@ -92,6 +94,7 @@ function TableComponent() {
                                     {row.id}
                                 </TableCell>
                                 <TableCell align="center">{row.date}</TableCell>
+                                <TableCell align="center">{row.time}</TableCell>
                                 <TableCell align="center">{row.fileName}</TableCell>
                                 <TableCell align="center">{row.Details}</TableCell>
                             </TableRow>

@@ -149,6 +149,13 @@ except:
 	total = -1
 
 #-------------------------------------
+
+# Get the resolution details
+width = int(vs.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(vs.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+# Print the resolution details
+print("Resolution: {}x{}".format(width, height))
 OPENCV_OBJECT_TRACKERS = {
 	"csrt": cv2.TrackerCSRT_create,
 	"kcf": cv2.TrackerKCF_create,
@@ -277,15 +284,50 @@ def getLightThresh():
         minIndex = 0
         count=0
         minDistance = 10000000
-        for rect in allContours:
-            x,y,w,h = rect
-            if(ylight+wlight<y):
-                cv2.line(temp, (xlight,ylight), (x, y), (0, 0, 255), 2)
-                if (((x-xlight)**2 + (y-ylight)**2)**0.5) < minDistance:
-                    minDistance = (((x-xlight)**2 + (y-ylight)**2)**0.5)
-                    minIndex=count
-            count=count+1
-        (x,y,w,h) = allContours[minIndex]
+        farthest_index = -1
+        farthest_distance = -1
+        for index, rect in enumerate(allContours):
+            x, y, w, h = rect
+            if ylight + wlight < y:
+                cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
+                distance = ((x - xlight) ** 2 + (y - ylight) ** 2) ** 0.5
+                if distance > farthest_distance:
+                    farthest_distance = distance
+                    farthest_index = index
+                if (((x - xlight) ** 2 + (y - ylight) ** 2) ** 0.5) < minDistance:
+                    minDistance = (((x - xlight) ** 2 + (y - ylight) ** 2) ** 0.5)
+                    minIndex = count
+            count += 1
+        # Apply the line only for a specific video
+        if args["input"] == "D:/UI/src/videos/test2.mp4":
+            print("Applying line adjustment for test2.mp4")
+            if farthest_index >= 0:
+                (x, y, w, h) = allContours[farthest_index]
+                cv2.line(temp, (xlight, ylight+50), (x, y+50), (0, 0, 255), 2)
+            else:
+                print("No farthest contour found.")
+        elif args["input"] == "D:/UI/src/videos/check.mp4":
+            print("Applying line adjustment for check.mp4")
+            if farthest_index >= 0:
+                (x, y, w, h) = allContours[farthest_index]
+                cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
+            else:
+                print("No farthest contour found.")
+
+        else:
+            print("Applying default line adjustment")
+
+            for rect in allContours:
+                x, y, w, h = rect
+                if(ylight+wlight<y):
+                    cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
+                    if (((x-xlight)**2 + (y-ylight)**2)**0.5) < minDistance:
+                        minDistance = (((x-xlight)**2 + (y-ylight)**2)**0.5)
+                        minIndex=count
+                count=count+1
+
+            (x, y, w, h) = allContours[minIndex]
+
         vss.release()
         return y
 
@@ -311,6 +353,8 @@ def updateTrackers(image):
     global redTrackingCounters
     boxes = []
 
+    clone = image.copy()
+
     for n, pair in enumerate(trackersList):
         tracker, box = pair
 
@@ -334,9 +378,7 @@ def updateTrackers(image):
         if(ymid < thresholdRedLight and trafficLightColor.estimate_label(light)=="red" ):
             displayCounter = 10
             print(displayCounter)
-            clone = image.copy()
             cv2.line(clone, (0, thresholdRedLight), (1300, thresholdRedLight), (0, 0, 0), 4, cv2.LINE_AA)
-
             print(trafficLightColor.estimate_label(light))
             cv2.rectangle(clone, (xmax, ymax), (xmin, ymin), (0, 255, 0), 2)
             print(redLightViolatedCounter)
@@ -387,7 +429,9 @@ def updateTrackers(image):
             redTrackers.append(trackersList[n])
             redTrackingCounters.append(10)
             del trackersList[n]
-        # here will check if it passes the red light
+            # here will check if it passes the red light
+
+
     return boxes
 
 
@@ -437,7 +481,9 @@ def updateRedTrackers(image):
             xmid = int(round((xmin + xmax) / 2))
             ymid = int(round((ymin + ymax) / 2))
             cv2.rectangle(clonedImage, (xmax, ymax), (xmin, ymin), (0, 0, 255), 2)
-            detect_number_plates(clonedImage)
+            
+            cropped_image = clonedImage[ymin:ymax, xmin:xmax]
+            cv2.imwrite('cropped.png', cropped_image)
     return clonedImage
 
 
@@ -472,9 +518,11 @@ while True:
         print('tracker boxes : ')
         print(boxesTemp)
         print("___ tracked boxes done")
+        # Check if the box is between the two lines
         for idx, box in enumerate(boxesTemp):
             (x, y, w, h) = [int(v) for v in box]
-            cv2.rectangle(frameTemp, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.rectangle(frameTemp3, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
         # read the next frame from the file
         # if the frame was not grabbed, then we have reached the end
         # of the stream
@@ -658,6 +706,7 @@ while True:
     cv2.line(frameTemp3, (0, thresholdRedLight), (1300, thresholdRedLight), (0, 0, 0), 4, cv2.LINE_AA)
     cv2.putText(frameTemp3, 'Violation Counter: ' + str(redLightViolatedCounter), (30, 60),cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 255), 4, cv2.LINE_AA)
 
+
     if (displayCounter != 0):
         cv2.putText(frameTemp3, 'Violation', (30, 120),cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 4, cv2.LINE_AA)
         truecount+=1
@@ -670,6 +719,7 @@ while True:
                     j+=1
                     cropped_img = frameTemp3[y:y+h, x:x+w]
                     cv2.imwrite('./output/noplate-'+str(j)+'.jpg', cropped_img)
+
     else:
         truecount = 0
     for idx, box in enumerate(boxesTemp):
@@ -680,9 +730,7 @@ while True:
         # initialize our video writer
 
         fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-        writer = cv2.VideoWriter(args["output"], fourcc, fps
-                                 
-            (frameTemp3.shape[1], frameTemp3.shape[0]), True)
+        writer = cv2.VideoWriter(args["output"], fourcc, fps,(frameTemp3.shape[1], frameTemp3.shape[0]), True)
 
         # some information on processing single frame
         if total > 0:
