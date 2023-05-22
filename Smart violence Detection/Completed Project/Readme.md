@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Automatic Traffic Red-Light Running Violation Detection
 ## Abstract
 An automatic traffic red-light violation detection system was implemented, which may play a big role in transportation management in smart cities. The system mainly relies on modern computer vision techniques, which was implemented in OpenCV under Python environment. Mainly, the system consists of object detector and object tracker which work in an integrated manner in order to precisely keep position of the existing cars. The primary task of the system is to eventually indicate locations of violating vehicles. The output showed accurate results, as all violating vehicles were detected and distinguished precisely.
@@ -101,3 +102,10 @@ Done by:
 - Osama Al-fakhouri
 
 
+=======
+The Following is the proposed Flow of Data
+
+![Smart Violence DFD](https://github.com/Ryuzaki9623/Smart-Violence-Detection-Street-Violence-Detection-Traffic-Light-Violation-/assets/45362890/f2305f4e-8806-4a1a-9575-40eba668d948)
+
+The idea is to check the first frame for traffic lights and crosswalks by passing it through the 2 models.If traffic lights exists it runs red light violation else it runs Violence Detection
+>>>>>>> 6150f754459cf952cdc109a239ffc17203c404dc
