@@ -30,6 +30,7 @@ function TableComponent() {
                     date: file.date || '',
                     fileName: file.name || '',
                     Details: file.status || '',
+                    NumberPlate: file.numberplate || ''
                 }));
                 const updatedAt = docSnap.data().updatedAt;
                 setRows(data);
@@ -55,7 +56,8 @@ function TableComponent() {
                             date: file.date || '',
                             time: file.time || '',
                             fileName: file.filename || '',
-                            Details: file.status || ''
+                            Details: file.status || '',
+                            NumberPlate: file.numberplate || ''
                         }));
                         setRows(data);
                         setLastUpdatedAt(updatedAt);
@@ -85,6 +87,7 @@ function TableComponent() {
                             <TableCell align="center">time</TableCell>
                             <TableCell align="center">File Name</TableCell>
                             <TableCell align="center">Status</TableCell>
+                            <TableCell align="center">Number Plate</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -97,6 +100,7 @@ function TableComponent() {
                                 <TableCell align="center">{row.time}</TableCell>
                                 <TableCell align="center">{row.fileName}</TableCell>
                                 <TableCell align="center">{row.Details}</TableCell>
+                                <TableCell align="center">{row.NumberPlate}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

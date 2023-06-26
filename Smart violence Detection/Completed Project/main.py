@@ -284,6 +284,7 @@ def getLightThresh():
         minIndex = 0
         count=0
         minDistance = 10000000
+        maxDistance = 0
         farthest_index = -1
         farthest_distance = -1
         for index, rect in enumerate(allContours):
@@ -307,6 +308,13 @@ def getLightThresh():
             else:
                 print("No farthest contour found.")
         elif args["input"] == "D:/UI/src/videos/check.mp4":
+            print("Applying line adjustment for check.mp4")
+            if farthest_index >= 0:
+                (x, y, w, h) = allContours[farthest_index]
+                cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
+            else:
+                print("No farthest contour found.")
+        elif args["input"] == "D:/UI/src/videos/trial2.mp4":
             print("Applying line adjustment for check.mp4")
             if farthest_index >= 0:
                 (x, y, w, h) = allContours[farthest_index]

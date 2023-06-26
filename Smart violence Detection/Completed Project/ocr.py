@@ -1,6 +1,6 @@
 import requests
 
-def get_number_plate(filename, token="483260c5b38609d2a17d8d59e2c5c37dd63c4136"):
+def get_number_plate(filename, token="aa5deb8434d9c6379260994d3680eb18413333b6"):
     """
     Get detected number plates as a list of (accuracy, string)
 
@@ -28,7 +28,7 @@ def get_number_plate(filename, token="483260c5b38609d2a17d8d59e2c5c37dd63c4136")
 
 
 def get_most_accurate_number_plate(
-    filename, token="483260c5b38609d2a17d8d59e2c5c37dd63c4136"
+    filename, token="aa5deb8434d9c6379260994d3680eb18413333b6"
 ):
     """Return the most accurate number plate from the image"""
     try:

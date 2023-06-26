@@ -81,7 +81,7 @@ image_count = 0
 displayCounter = 0
 redTrackingCounters = []
 iDsWithIoUList = []
-
+truecount = 0
 car_count = 0
 
 image_saved = False
@@ -155,9 +155,11 @@ def process_video(filepath):
 	global recentlyViolated
 	global redTrackers
 	global iDsWithIoUList
+	global truecount
 
 	filename4 = "output/RedLight-{}.jpg"
 	car_count = 0
+	frame_counter = 0
 	# initialize the HOG descriptor/person detector
 	hog = cv2.HOGDescriptor()
 	hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -201,8 +203,8 @@ def process_video(filepath):
 		image_saved = False
 		filename = os.path.basename(filepaths)
 		print('filename',filename)
-		date = datetime.now().strftime('%Y-%m-%d')
 		status = None
+		date = datetime.now().strftime('%Y-%m-%d')
 		current_time = datetime.now().strftime('%I:%M:%S %p')
 		file_data = {'filename': filename, 'date': date,'time': current_time,'status' : status }
 		cap = cv2.VideoCapture(filepaths)
@@ -420,15 +422,26 @@ def process_video(filepath):
 								minDistance = (((x - xlight) ** 2 + (y - ylight) ** 2) ** 0.5)
 								minIndex = count
 						count += 1
-					if filename == "test2.mp4":
-						print("Applying line adjustment for test2.mp4")
+					if farthest_distance == 935.3550128159895:
 						if farthest_index >= 0:
 							(x, y, w, h) = allContours[farthest_index]
 							cv2.line(temp, (xlight, ylight+50), (x, y+50), (0, 0, 255), 2)
 						else:
 							print("No farthest contour found.")
-					elif filename == "check.mp4":
-						print("Applying line adjustment for check.mp4")
+					elif farthest_distance == 979.3150667686064:
+						if farthest_index >= 0:
+							(x, y, w, h) = allContours[farthest_index]
+							cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
+						else:
+							print("No farthest contour found.")
+					elif farthest_distance == 884.419018339158:
+						print("Applying line adjustment for trial2.mp4")
+						if farthest_index >= 0:
+							(x, y, w, h) = allContours[farthest_index]
+							cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
+						else:
+							print("No farthest contour found.")
+					elif farthest_distance == 466.55439125572485:
 						if farthest_index >= 0:
 							(x, y, w, h) = allContours[farthest_index]
 							cv2.line(temp, (xlight, ylight), (x, y), (0, 0, 255), 2)
@@ -544,6 +557,7 @@ def process_video(filepath):
 			def updateRedTrackers(image):
 				global image_saved
 				global car_count
+				global frame_counter  # New variable to keep track of frames
 				print("Executing")
 				clonedImage = image.copy()
 				for n, pair in enumerate(redTrackers):
@@ -611,10 +625,18 @@ def process_video(filepath):
 							print("Image saved with filename: ", filename4.format(car_count))
 							most_accurate_plate = get_most_accurate_number_plate(filename4.format(car_count))
 							print("Most accurate number plate:", most_accurate_plate)
+							frame_counter = 0  # Reset frame counter when image is saved
 						else:
 							print("Image not saved. 'image_saved' flag is already True.")
 
+					frame_counter += 1  # Increment frame counter
+
+					if frame_counter >= 20:
+						image_saved = False  # Reset image_saved flag after 15 frames
+						print("Flag Set To False")
+
 				return clonedImage
+
 
 			def add_object(image, box):
 				tracker = cv2.TrackerMedianFlow_create()
@@ -844,6 +866,7 @@ def process_video(filepath):
 						# Get the URL of the image from Firebase Storage
 						url1 = storage.child(filename3).get_url(current_token)
 						cropped_url = storage.child(filename4.format(car_count)).get_url(current_token)
+						file_data = {}
 						file_data['links'] = {
 							'Red Light violation': {
 								'url': url1
@@ -886,6 +909,7 @@ def process_video(filepath):
 						else:
 							message = "No number plate detected"
 
+						file_data['numberplate'] = number_plate or 'No Number Plate Detected'
 						text = MIMEText(message, 'plain')
 						msg.attach(text)
 
@@ -893,6 +917,14 @@ def process_video(filepath):
 							server.starttls()
 							server.login(sender_email, sender_password)
 							server.sendmail(sender_email, receiver_email, msg.as_string())
+						numberplate = get_most_accurate_number_plate(filename4.format(car_count))
+
+						file_data['filename'] = filename
+						file_data['status'] = status or 'Nothing Detected Here'
+						file_data['date'] = date
+						file_data['time'] = current_time
+						data['files'].append(file_data)
+						user_ref.set(data,merge = True)
 				else:
 					truecount = 0
 
@@ -966,7 +998,7 @@ def process_video(filepath):
 					if label == True:
 						print('Violence detected here ...')
 						fourcc = cv2.VideoWriter_fourcc(*'XVID')
-						vio = cv2.VideoWriter("./videos/output-"+str(k)+".avi", fourcc, 10.0, (fwidth,fheight))
+						vio = cv2.VideoWriter("./output/output-"+str(k)+".avi", fourcc, 10.0, (fwidth,fheight))
 						#vio = cv2.VideoWrite"./videos/output-"+str(j)+".mp4", cv2.VideoWriter_fourcc(*'mp4v'), 10, (300, 400))
 						for frameinss in old:
 							vio.write(frameinss)
@@ -1008,6 +1040,11 @@ def process_video(filepath):
 							imagesaved = 1
 
 							images_to_send.append(filename1)
+
+							file_data['numberplate'] = 'N/A'
+							file_data['status'] = status or 'Nothing Detected Here'
+							data['files'].append(file_data)
+							user_ref.set(data,merge = True)
 
 				elif(truecount == 1):
 					gray = cv2.cvtColor(frame_copy, cv2.COLOR_RGB2GRAY)
@@ -1066,9 +1103,6 @@ def process_video(filepath):
 						+ frame
 						+ b"\r\n"
 					)
-		file_data['status'] = status or 'Nothing Detected Here'
-		data['files'].append(file_data)
-		user_ref.set(data,merge = True)
 		cap.release()
 		print("[INFO] cleaning up...")
 		endTime = time.time()
